@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El paciente eléctrico: actividad de clase</title>
+<style>
+:root{
+  --bg:#f3f7f1; --panel:#ffffff; --ink:#2f3a36; --muted:#5f6b66; --line:#d3e3cc;
+  --dg:#007a5e; --lg:#72be44; --tint:#eaf5e4; --on-dg:#ffffff; --link:#006a52;
+  --ok:#1d6b4a; --ok-bg:#dcefe5; --bad:#9a3412; --bad-bg:#fbe6d8; --chip:#e4efe0;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1c18; --panel:#16271f; --ink:#e3ece7; --muted:#a3b6ad; --line:#2d4439;
+    --dg:#0b5c47; --lg:#8fd165; --tint:#1c3328; --on-dg:#ffffff; --link:#8fd165;
+    --ok:#7fd3a8; --ok-bg:#183a2b; --bad:#f4a77a; --bad-bg:#3d2417; --chip:#203a2e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1c18; --panel:#16271f; --ink:#e3ece7; --muted:#a3b6ad; --line:#2d4439;
+  --dg:#0b5c47; --lg:#8fd165; --tint:#1c3328; --on-dg:#ffffff; --link:#8fd165;
+  --ok:#7fd3a8; --ok-bg:#183a2b; --bad:#f4a77a; --bad-bg:#3d2417; --chip:#203a2e;
+  color-scheme: dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,Verdana,'Segoe UI',system-ui,sans-serif;font-size:17px;line-height:1.55}
+h1,h2,h3{line-height:1.2;margin:0}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px}
+header.hero{background:var(--dg);color:var(--on-dg);padding:40px 0 34px}
+.hero .brand{font-size:14px;letter-spacing:.12em;color:#d8f0c4;font-weight:700}
+.hero h1{font-size:clamp(34px,6vw,54px);font-weight:700;margin-top:10px}
+.hero p{max-width:64ch;color:#e3f1dc;margin:12px 0 0}
+.who{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-top:24px}
+.who label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:#e3f1dc}
+.who input{font:inherit;padding:10px 12px;border-radius:10px;border:1px solid #3f9a80;background:#0a6a52;color:#fff}
+nav.steps{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:11;background:var(--bg)}
+nav.steps ol{list-style:none;margin:0 auto;padding:10px 20px;max-width:880px;display:flex;gap:8px;overflow-x:auto}
+nav.steps a{display:flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none;color:var(--ink);font-size:14px;padding:6px 12px;border-radius:999px;background:var(--chip)}
+nav.steps a .dot{width:10px;height:10px;border-radius:50%;background:var(--line)}
+nav.steps a.done .dot{background:var(--lg)}
+section.station{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px;margin:26px 0}
+.st-head{display:flex;gap:16px;align-items:flex-start}
+.num{flex:none;width:52px;height:52px;border-radius:50%;background:var(--dg);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:24px}
+.station h2{font-size:26px;color:var(--dg)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .station h2{color:var(--lg)}}
+:root[data-theme="dark"] .station h2{color:var(--lg)}
+.slides{display:inline-block;margin-top:6px;font-size:14px;font-weight:700;color:var(--link);background:var(--tint);padding:3px 10px;border-radius:999px}
+.intro{color:var(--muted);margin:14px 0 14px;max-width:68ch}
+details.formulas{background:var(--tint);border-radius:12px;padding:10px 16px;margin:0 0 18px}
+details.formulas summary{cursor:pointer;font-weight:700;color:var(--link)}
+details.formulas ul{margin:10px 0 4px;padding-left:20px}
+.part{margin-top:22px;padding-top:18px;border-top:1px dashed var(--line)}
+.part h3{font-size:19px;margin-bottom:6px}
+.case{background:var(--dg);color:#fff;border-radius:12px;padding:16px 18px;margin:8px 0 16px}
+.case b{color:#d8f0c4}
+.item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.item:first-child{border-top:none}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{font:inherit;font-size:15px;padding:7px 13px;border:0;background:transparent;color:var(--ink);cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--dg);color:#fff}
+.mark{font-size:14px;font-weight:700;padding:2px 10px;border-radius:999px}
+.mark.ok{background:var(--ok-bg);color:var(--ok)}
+.mark.bad{background:var(--bad-bg);color:var(--bad)}
+.q{margin:16px 0 0}
+.q > p{font-weight:700;margin:0 0 8px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opts label{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.opts input{margin-top:5px;accent-color:var(--dg)}
+.fb{margin:8px 0 0;padding:9px 12px;border-radius:10px;font-size:15px}
+.fb.ok{background:var(--ok-bg);color:var(--ok)}
+.fb.bad{background:var(--bad-bg);color:var(--bad)}
+textarea,input[type=text],select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+textarea{width:100%;min-height:90px;resize:vertical}
+.numrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.numrow input{width:120px}
+.check{font:inherit;font-weight:700;margin-top:22px;padding:12px 20px;border:0;border-radius:12px;background:var(--lg);color:#123b16;cursor:pointer}
+.score{margin-left:12px;font-weight:700;color:var(--muted)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--lg);outline-offset:2px}
+.lab{display:grid;gap:14px;background:var(--bg);border-radius:12px;padding:16px;border:1px solid var(--line)}
+.sliders{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.sliders label{display:flex;flex-direction:column;gap:4px;font-size:14px}
+.sliders output{font-weight:700;font-size:17px}
+input[type=range]{width:100%;accent-color:var(--dg)}
+.readout{display:flex;gap:28px;flex-wrap:wrap}
+.readout b{font-size:24px;display:block;color:var(--link)}
+svg{max-width:100%;height:auto;display:block}
+.big{font-weight:700;font-size:48px;line-height:1;color:var(--link)}
+.gauge{position:relative;height:26px;border-radius:999px;background:var(--chip);border:1px solid var(--line);overflow:hidden}
+.gauge .band{position:absolute;top:0;bottom:0;background:var(--ok-bg)}
+.gauge .needle{position:absolute;top:-2px;bottom:-2px;width:4px;background:var(--dg);border-radius:2px;transition:left .15s}
+.scale{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.match{display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:center}
+#summary{display:none}
+#summary.show{display:block}
+.sumgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 0}
+.sumgrid div{background:var(--bg);border-radius:12px;padding:12px;text-align:center;font-size:14px}
+.sumgrid b{display:block;font-size:24px;color:var(--link)}
+.answers p{margin:6px 0 14px;white-space:pre-wrap}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.ghost{font:inherit;font-weight:700;padding:11px 18px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.note{font-size:14px;color:var(--muted)}
+footer{padding:20px 0 48px;color:var(--muted);font-size:14px}
+@media (max-width:640px){.who,.sliders{grid-template-columns:1fr}.sumgrid{grid-template-columns:repeat(2,1fr)}section.station{padding:18px}.match{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{nav.steps,.check,.ghost,section.station{display:none!important}#summary{display:block!important}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="brand">UNIAGRARIA · Física para Medicina Veterinaria · Tema 7</div>
+    <h1>El paciente eléctrico</h1>
+    <p>Actividad de clase en parejas o tríos. Cada estación corresponde a un bloque de la presentación «Electricidad en el cuerpo animal»: tened a mano las diapositivas indicadas y la guía en PDF. Comprobad cada estación y, al final, generad el resumen para entregarlo.</p>
+    <div class="who">
+      <label>Nombres de los integrantes<input id="names" autocomplete="off" placeholder="Ana Ruiz, Luis Gómez"></label>
+      <label>Grupo o mesa<input id="group" autocomplete="off" placeholder="Mesa 3"></label>
+    </div>
+  </div>
+</header>
+
+<nav class="steps" aria-label="Estaciones">
+  <ol>
+    <li><a href="#e1" data-st="s1"><span class="dot"></span>1 Carga y Coulomb</a></li>
+    <li><a href="#e2" data-st="s2"><span class="dot"></span>2 Campo y potencial</a></li>
+    <li><a href="#e3" data-st="s3"><span class="dot"></span>3 Condensadores y corriente</a></li>
+    <li><a href="#e4" data-st="s4"><span class="dot"></span>4 Caso Michi</a></li>
+    <li><a href="#e5" data-st="s5"><span class="dot"></span>5 La consulta</a></li>
+    <li><a href="#resumen"><span class="dot"></span>Entregar</a></li>
+  </ol>
+</nav>
+
+<main class="wrap">
+
+<!-- ========== ESTACIÓN 1 ========== -->
+<section class="station" id="e1">
+  <div class="st-head"><div class="num">1</div><div><h2>La carga y la ley de Coulomb</h2><span class="slides">Repasad las diapositivas 5 a 8</span></div></div>
+  <p class="intro">Antes de hacer un electrocardiograma hay que saber por dónde pasa la carga. Después, mediréis cómo se atraen los iones del plasma.</p>
+  <details class="formulas"><summary>Fórmulas que necesitáis</summary><ul>
+    <li>F = K · q₁ · q₂ / r², con K = 9 × 10⁹ N·m²/C² (diapositiva 7)</li>
+    <li>En un medio: la fuerza se divide entre εᵣ (agua: εᵣ ≈ 80)</li>
+    <li>Carga de un ion monovalente: e = 1,602 × 10⁻¹⁹ C (diapositiva 5)</li></ul></details>
+
+  <div class="part"><h3>1a. ¿Conduce o aísla? <span class="note">(diapositiva 6)</span></h3><div id="s1list"></div></div>
+
+  <div class="part"><h3>1b. Laboratorio de Coulomb <span class="note">(diapositiva 7)</span></h3>
+    <p class="note">La fuerza se muestra en «veces» respecto a dos cargas de +1 separadas 1 unidad.</p>
+    <div class="lab">
+      <div class="sliders">
+        <label>Carga A <output id="qaOut">+2</output><input type="range" id="qa" min="-3" max="3" step="1" value="2"></label>
+        <label>Carga B <output id="qbOut">+1</output><input type="range" id="qb" min="-3" max="3" step="1" value="1"></label>
+        <label>Distancia <output id="dOut">1</output><input type="range" id="dd" min="1" max="4" step="0.5" value="1"></label>
+      </div>
+      <svg id="coulombSvg" viewBox="0 0 600 160" role="img" aria-label="Dos cargas con flechas que indican la fuerza"></svg>
+      <div class="readout"><div>Fuerza<b id="fOut">2 veces</b></div><div>Interacción<b id="iOut">Se repelen</b></div></div>
+    </div>
+    <div id="s1mcqA"></div>
+  </div>
+
+  <div class="part"><h3>1c. Fuerza entre dos iones del plasma <span class="note">(diapositivas 7 y 8)</span></h3>
+    <div class="case">Un ion <b>Na⁺</b> y un ion <b>Cl⁻</b> están separados <b>0,5 nm</b> (5 × 10⁻¹⁰ m). Cada uno tiene una carga de valor e.</div>
+    <div id="s1nums"></div>
+    <div id="s1mcqB"></div>
+  </div>
+  <button class="check" data-check="s1">Comprobar estación 1</button><span class="score" id="s1score"></span>
+</section>
+
+<!-- ========== ESTACIÓN 2 ========== -->
+<section class="station" id="e2">
+  <div class="st-head"><div class="num">2</div><div><h2>Campo, potencial y seguridad</h2><span class="slides">Repasad las diapositivas 10 a 15</span></div></div>
+  <p class="intro">Del ion al pájaro en el cable: el potencial explica por qué unas situaciones electrocutan a un animal y otras no.</p>
+  <details class="formulas"><summary>Fórmulas que necesitáis</summary><ul>
+    <li>V = K · q / r; varias cargas: V = Σ K·qᵢ/rᵢ, se suma con signo (diapositivas 13 y 14)</li>
+    <li>E = K · q / r², se suma como vector (diapositiva 10)</li>
+    <li>Momento dipolar: μ = q · d (diapositiva 12)</li></ul></details>
+
+  <div class="part"><h3>2a. Cálculos</h3><div id="s2nums"></div></div>
+  <div class="part"><h3>2b. Razonamiento <span class="note">(diapositivas 10, 14 y 15)</span></h3><div id="s2mcq"></div></div>
+  <div class="part"><h3>2c. ¿Circula una corriente peligrosa por el animal? <span class="note">(diapositivas 15 y 18)</span></h3>
+    <div id="s2list"></div>
+    <div class="q"><p>Explicad con la idea de «diferencia de potencial» por qué el gorrión no se electrocuta.</p><textarea id="open2" data-open></textarea></div>
+  </div>
+  <button class="check" data-check="s2">Comprobar estación 2</button><span class="score" id="s2score"></span>
+</section>
+
+<!-- ========== ESTACIÓN 3 ========== -->
+<section class="station" id="e3">
+  <div class="st-head"><div class="num">3</div><div><h2>Condensadores y corriente</h2><span class="slides">Repasad las diapositivas 17, 18 y 22</span></div></div>
+  <p class="intro">La membrana de una neurona es un condensador plano. Calcularéis lo mismo que en los problemas 9 a 12 de la relación.</p>
+  <details class="formulas"><summary>Fórmulas que necesitáis</summary><ul>
+    <li>E = ΔV / d &nbsp;y&nbsp; E = σ / ε (diapositivas 17 y 22)</li>
+    <li>C / S = ε / d, con ε = εᵣ · ε₀ y ε₀ = 8,854 × 10⁻¹² C²/(N·m²)</li>
+    <li>σ = (C/S) · ΔV &nbsp;·&nbsp; I = q / t &nbsp;·&nbsp; q = n · F, con F = 96 485 C/mol (diapositiva 18)</li></ul></details>
+  <div class="case">Membrana de una neurona de perro: espesor <b>d = 8 nm</b>, permitividad <b>ε = 7ε₀</b>, potencial de membrana <b>ΔV = 70 mV</b>.</div>
+  <div class="part"><h3>3a. La membrana como condensador</h3><div id="s3numsA"></div></div>
+  <div class="part"><h3>3b. La bomba Na-K genera corriente</h3>
+    <p class="note">Un tramo de axón expulsa 2 × 10⁻¹² mol de Na⁺ por segundo.</p>
+    <div id="s3numsB"></div></div>
+  <div class="part"><h3>3c. Razonamiento</h3><div id="s3mcq"></div></div>
+  <button class="check" data-check="s3">Comprobar estación 3</button><span class="score" id="s3score"></span>
+</section>
+
+<!-- ========== ESTACIÓN 4 ========== -->
+<section class="station" id="e4">
+  <div class="st-head"><div class="num">4</div><div><h2>Caso clínico: Michi</h2><span class="slides">Repasad las diapositivas 20 a 24</span></div></div>
+  <div class="case"><b>Michi</b>, gato macho castrado de 4 años, lleva 36 horas intentando orinar sin éxito. Llega apático, con la vejiga dura y 110 latidos por minuto (lo normal en gato es 140 a 220). Análisis: <b>K⁺ en sangre 9,0 mmol/L</b> (normal 3,5 a 5,5).</div>
+  <details class="formulas"><summary>Fórmula que usa el simulador</summary><ul>
+    <li>Nernst: Vₘ = (k_B·T / e) · ln(cₑ / cᵢ) (diapositiva 21)</li>
+    <li>T = 38,5 °C = 311,65 K, así que k_B·T/e ≈ 26,9 mV; dentro de la célula cᵢ = 140 mmol/L</li></ul></details>
+  <div class="lab">
+    <label for="ke">K⁺ en sangre (fuera de la célula): <output id="keOut">4,0</output> mmol/L</label>
+    <input type="range" id="ke" min="2" max="10" step="0.1" value="4">
+    <div><span class="big" id="vmOut">−95,5</span> mV</div>
+    <div class="gauge" aria-hidden="true"><div class="band" id="band"></div><div class="needle" id="needle"></div></div>
+    <div class="scale"><span>−115 mV (más negativo)</span><span>−60 mV (más cerca de 0)</span></div>
+    <p class="note">La franja verde corresponde a valores normales de K⁺ en sangre.</p>
+  </div>
+  <div class="part"><h3>4a. Lectura del simulador</h3><div id="s4nums"></div></div>
+  <div class="part"><h3>4b. Interpretación <span class="note">(diapositivas 23 y 24)</span></h3><div id="s4mcq"></div>
+    <div class="q"><p>En dos o tres frases y sin fórmulas: ¿por qué el corazón de Michi late tan despacio?</p><textarea id="open4" data-open></textarea></div></div>
+  <button class="check" data-check="s4">Comprobar estación 4</button><span class="score" id="s4score"></span>
+</section>
+
+<!-- ========== ESTACIÓN 5 ========== -->
+<section class="station" id="e5">
+  <div class="st-head"><div class="num">5</div><div><h2>La física en la consulta</h2><span class="slides">Repasad las diapositivas 26 y 27</span></div></div>
+  <p class="intro">Relacionad cada situación de la clínica con el concepto del tema que mejor la explica.</p>
+  <div class="match" id="s5list"></div>
+  <div class="q"><p>¿Qué concepto del tema os parece más útil para vuestra futura práctica veterinaria, y por qué?</p><textarea id="open5" data-open></textarea></div>
+  <button class="check" data-check="s5">Comprobar estación 5</button><span class="score" id="s5score"></span>
+</section>
+
+<section class="station" id="resumen">
+  <h2>Entregar la actividad</h2>
+  <p class="intro">Cuando hayáis comprobado las cinco estaciones, generad el resumen y entregadlo como indique el docente.</p>
+  <button class="check" id="makeSummary">Generar resumen</button>
+</section>
+<section id="summary" class="station" aria-live="polite"></section>
+</main>
+<footer class="wrap">UNIAGRARIA · Física para Medicina Veterinaria, tema 7: Electricidad en el cuerpo animal.</footer>
+
+<script>
+const KEY='paciente-electrico-v2';
+let state={};
+try{state=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){state={}}
+state.ans=state.ans||{};state.tries=state.tries||{};state.scores=state.scores||{};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+const $=s=>document.querySelector(s);
+const KC=9e9,E0=8.854e-12,QE=1.602e-19,FAR=96485;
+
+/* ---------------- datos ---------------- */
+const S1LIST=[['sangre','Sangre','c'],['pelo','Pelo seco de un perro','a'],['gel','Gel de electrocardiografía','c'],['bicapa','Bicapa lipídica de la membrana','a'],['orina','Orina','c'],['plumas','Plumas secas de un loro','a'],['pinza','Pinza metálica del electrodo','c'],['suero','Suero fisiológico','c']];
+const S1MCQA=[
+ {id:'q1a',p:'Con carga A = +2, carga B = +1 y distancia 1, llevad la distancia a 2. ¿Qué le pasa a la fuerza?',o:['Se reduce a la mitad','Se reduce a la cuarta parte','No cambia','Se duplica'],c:1,why:'La fuerza depende de 1/r²: al doble de distancia, la cuarta parte (diapositiva 7).'},
+ {id:'q1b',p:'Con distancia 1, cambiad la carga B de +1 a −1. ¿Qué cambia?',o:['La fuerza desaparece','Mismo tamaño, pero pasan de repelerse a atraerse','Se duplica la fuerza'],c:1,why:'El signo solo decide atracción o repulsión (diapositiva 5).'}];
+const S1NUM=[
+ {id:'n1a',p:'Fuerza entre Na⁺ y Cl⁻ en el vacío',unit:'× 10⁻¹⁰ N',target:KC*QE*QE/Math.pow(5e-10,2)/1e-10,tol:0.3,hint:'F = 9×10⁹ · (1,602×10⁻¹⁹)² / (5×10⁻¹⁰)². Pasad nm a m.'},
+ {id:'n1b',p:'La misma fuerza dentro del agua del plasma (εᵣ ≈ 80)',unit:'× 10⁻¹¹ N',target:KC*QE*QE/Math.pow(5e-10,2)/80/1e-11,tol:0.08,hint:'Dividid la fuerza anterior entre 80 y expresadla en 10⁻¹¹ N.'}];
+const S1MCQB=[{id:'q1c',p:'Según vuestro resultado, ¿por qué la sal se disuelve en el plasma?',o:['El agua neutraliza la carga de los iones','El agua debilita unas 80 veces la atracción y los iones quedan libres','El plasma no tiene carga eléctrica'],c:1,why:'El medio importa: la permitividad del agua reduce la fuerza (diapositiva 7).'}];
+
+const S2NUM=[
+ {id:'n2a',p:'Potencial a 1 nm de un ion K⁺',unit:'V',target:KC*QE/1e-9,tol:0.04,hint:'V = K·q/r con q = e y r = 10⁻⁹ m (diapositiva 13).'},
+ {id:'n2b',p:'El agua tiene μ = 6,2 × 10⁻³⁰ C·m. Si sus cargas fueran +e y −e, ¿cuál sería su separación d?',unit:'× 10⁻¹¹ m',target:6.2e-30/QE/1e-11,tol:0.1,hint:'d = μ / e (diapositiva 12; es el problema 7 con otra molécula).'}];
+const S2MCQ=[
+ {id:'q2a',p:'Tres cargas iguales a 120° alrededor de un punto central. En ese centro…',o:['E = 0 y V = 0','E = 0, pero V ≠ 0','E ≠ 0 y V = 0'],c:1,why:'Los vectores E se cancelan por simetría, pero V es la suma de tres números del mismo signo (diapositivas 10 y 14; problema 3).'},
+ {id:'q2b',p:'Una carga negativa (por ejemplo, un ion Cl⁻) que se suelta en un campo eléctrico se mueve…',o:['En el sentido del campo, hacia V más bajo','En contra del campo, hacia V más alto','No se mueve'],c:1,why:'q < 0 va contra E, hacia potenciales más altos (diapositiva 15).'}];
+const S2LIST=[
+ ['gorrion','Un gorrión posado con las dos patas en el mismo cable de alta tensión.','n','Ambas patas están al mismo potencial: no hay diferencia de potencial.'],
+ ['aguila','Un águila que toca con un ala el cable y con la otra el poste metálico.','s','Queda entre dos potenciales muy distintos: la corriente la atraviesa.'],
+ ['cachorro','Un cachorro que muerde un cable pelado mientras está en el suelo.','s','La corriente entra por la boca y sale por las patas.'],
+ ['vaca','Una vaca sobre suelo mojado toca un bebedero con una fuga de corriente.','s','El suelo mojado baja la resistencia y la corriente circula.'],
+ ['caballo','Un caballo toca un pastor eléctrico homologado.','n','Pulsos muy breves de baja corriente: molestan, no lesionan.']];
+
+const epsM=7*E0, dM=8e-9, dV=0.07;
+const S3NUMA=[
+ {id:'n3a',p:'Campo eléctrico dentro de la membrana',unit:'× 10⁶ V/m',target:dV/dM/1e6,tol:0.1,hint:'E = ΔV / d = 0,07 V / 8×10⁻⁹ m.'},
+ {id:'n3b',p:'Capacidad por unidad de área',unit:'× 10⁻³ F/m²',target:epsM/dM/1e-3,tol:0.1,hint:'C/S = ε/d = 7 · 8,854×10⁻¹² / 8×10⁻⁹.'},
+ {id:'n3c',p:'Carga por unidad de área en cada cara (σ)',unit:'× 10⁻⁴ C/m²',target:epsM/dM*dV/1e-4,tol:0.15,hint:'σ = (C/S) · ΔV. Comprobad también que E = σ/ε da lo mismo que en 3a.'}];
+const S3NUMB=[{id:'n3d',p:'Corriente que genera la bomba',unit:'× 10⁻⁷ A',target:2e-12*FAR/1e-7,tol:0.05,hint:'I = q/t, y q = n·F: 2×10⁻¹² mol/s · 96 485 C/mol.'}];
+const S3MCQ=[
+ {id:'q3a',p:'Si la membrana fuera la mitad de gruesa (mismo ε), su capacidad por unidad de área…',o:['Se reduce a la mitad','Se duplica','No cambia'],c:1,why:'C/S = ε/d: menos espesor, más capacidad (diapositiva 17; problema 8).'},
+ {id:'q3b',p:'¿Qué guarda el condensador de un desfibrilador antes de la descarga?',o:['Corriente continua','Carga y energía, con un voltaje alto entre placas','Iones de potasio'],c:1,why:'Un condensador almacena carga q = C·V y energía; la descarga produce la corriente (diapositivas 17 y 26).'}];
+
+const KI=140, RTF=1.380649e-23*(273.15+38.5)/QE*1000;
+const vm=ke=>RTF*Math.log(ke/KI);
+const S4NUM=[
+ {id:'n4a',p:'Potencial de reposo con K⁺ = 4,0 mmol/L (normal)',unit:'mV',target:vm(4),tol:2,hint:'Moved el control a 4,0. El interior es negativo.'},
+ {id:'n4b',p:'Potencial de reposo con el K⁺ de Michi (9,0 mmol/L)',unit:'mV',target:vm(9),tol:2,hint:'Moved el control a 9,0.'}];
+const S4MCQ=[
+ {id:'q4a',p:'Con hiperpotasemia, el potencial de reposo de las células cardíacas…',o:['…se vuelve más negativo','…se vuelve menos negativo (más cerca de 0)','…no cambia'],c:1,why:'Con más K⁺ fuera, el K⁺ tiene menos «empuje» para salir (diapositivas 21 y 23).'},
+ {id:'q4b',p:'¿Qué tratamiento tiene sentido desde el punto de vista eléctrico?',o:['Dar un suplemento de potasio','Desobstruir la uretra y bajar el K⁺ en sangre; el gluconato cálcico protege el corazón mientras tanto','Esperar a que orine solo'],c:1,why:'Hay que devolver el K⁺ a su valor normal para que la membrana recupere su potencial (diapositiva 24).'}];
+
+const CONCEPTS=['Dipolo','Condensador','Conductores y aislantes','Corriente y resistencia','Potencial de membrana','Diferencia de potencial'];
+const S5=[
+ ['ecg','El electrocardiograma registra la actividad del corazón desde la piel',0],
+ ['desfib','El desfibrilador acumula energía y la libera en milisegundos',1],
+ ['alcohol','Se moja el pelo con alcohol antes de colocar las pinzas del ECG',2],
+ ['bisturi','El electrobisturí corta tejido al concentrar la corriente en un punto',3],
+ ['michi','Michi tiene bradicardia por exceso de potasio en sangre',4],
+ ['rapaz','Una rapaz muere al tocar a la vez el cable y el poste',5]];
+
+/* ---------------- construcción ---------------- */
+function seg(id,choices){
+  const w=document.createElement('div');w.className='seg';w.setAttribute('role','group');
+  choices.forEach(([v,l])=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.dataset.val=v;
+    b.setAttribute('aria-pressed',state.ans[id]===v?'true':'false');
+    b.onclick=()=>{state.ans[id]=v;save();w.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.val===v?'true':'false'));};
+    w.appendChild(b);});
+  return w;
+}
+function itemRow(id,text,choices,withFb){
+  const r=document.createElement('div');r.className='item';
+  const t=document.createElement('span');t.textContent=text;t.style.flex='1 1 260px';
+  const right=document.createElement('div');right.style.cssText='display:flex;gap:10px;align-items:center';
+  const m=document.createElement('span');m.className='mark';m.id='m-'+id;right.append(seg(id,choices),m);r.append(t,right);
+  if(withFb){const f=document.createElement('div');f.className='fb';f.id='fb-'+id;f.hidden=true;f.style.flexBasis='100%';r.appendChild(f);}
+  return r;
+}
+function mcq(el,list){list.forEach(q=>{
+  const d=document.createElement('div');d.className='q';const p=document.createElement('p');p.textContent=q.p;d.appendChild(p);
+  const o=document.createElement('div');o.className='opts';
+  q.o.forEach((tx,i)=>{const l=document.createElement('label');const r=document.createElement('input');r.type='radio';r.name=q.id;r.value=i;
+    if(state.ans[q.id]===i)r.checked=true;r.onchange=()=>{state.ans[q.id]=i;save();};const s=document.createElement('span');s.textContent=tx;l.append(r,s);o.appendChild(l);});
+  d.appendChild(o);const f=document.createElement('div');f.className='fb';f.id='fb-'+q.id;f.hidden=true;d.appendChild(f);el.appendChild(d);});}
+function nums(el,list){list.forEach(n=>{
+  const d=document.createElement('div');d.className='q';const p=document.createElement('p');p.textContent=n.p;d.appendChild(p);
+  const row=document.createElement('div');row.className='numrow';
+  const i=document.createElement('input');i.type='text';i.inputMode='decimal';i.id=n.id;i.placeholder='valor';i.setAttribute('aria-label',n.p+' en '+n.unit);
+  i.value=state.ans[n.id]||'';i.oninput=()=>{state.ans[n.id]=i.value;save();};
+  const u=document.createElement('span');u.textContent=n.unit;row.append(i,u);d.appendChild(row);
+  const f=document.createElement('div');f.className='fb';f.id='fb-'+n.id;f.hidden=true;d.appendChild(f);el.appendChild(d);});}
+
+S1LIST.forEach(([id,t])=>$('#s1list').appendChild(itemRow('s1-'+id,t,[['c','Conduce'],['a','Aísla']])));
+mcq($('#s1mcqA'),S1MCQA);nums($('#s1nums'),S1NUM);mcq($('#s1mcqB'),S1MCQB);
+nums($('#s2nums'),S2NUM);mcq($('#s2mcq'),S2MCQ);
+S2LIST.forEach(([id,t])=>$('#s2list').appendChild(itemRow('s2-'+id,t,[['s','Sí'],['n','No']],true)));
+nums($('#s3numsA'),S3NUMA);nums($('#s3numsB'),S3NUMB);mcq($('#s3mcq'),S3MCQ);
+nums($('#s4nums'),S4NUM);mcq($('#s4mcq'),S4MCQ);
+S5.forEach(([id,t])=>{const l=document.createElement('label');l.textContent=t;l.htmlFor='sel-'+id;
+  const b=document.createElement('div');b.style.cssText='display:flex;gap:10px;align-items:center';
+  const s=document.createElement('select');s.id='sel-'+id;s.innerHTML='<option value="">Elegid un concepto</option>'+CONCEPTS.map((c,i)=>`<option value="${i}">${c}</option>`).join('');
+  if(state.ans['s5-'+id]!==undefined)s.value=state.ans['s5-'+id];s.onchange=()=>{state.ans['s5-'+id]=s.value;save();};
+  const m=document.createElement('span');m.className='mark';m.id='m-s5-'+id;b.append(s,m);$('#s5list').append(l,b);});
+document.querySelectorAll('[data-open]').forEach(el=>{el.value=state.ans[el.id]||'';el.oninput=()=>{state.ans[el.id]=el.value;save();};});
+['names','group'].forEach(id=>{const el=$('#'+id);el.value=state.ans[id]||'';el.oninput=()=>{state.ans[id]=el.value;save();};});
+
+/* ---------------- laboratorio de Coulomb ---------------- */
+const fs=v=>v>0?'+'+v:(v<0?'−'+Math.abs(v):'0');const fn=v=>(Math.round(v*100)/100).toString().replace('.',',');
+function drawC(){
+  const qa=+$('#qa').value,qb=+$('#qb').value,d=+$('#dd').value;
+  $('#qaOut').textContent=fs(qa);$('#qbOut').textContent=fs(qb);$('#dOut').textContent=fn(d);
+  const F=Math.abs(qa*qb)/(d*d);
+  $('#fOut').textContent=F===0?'0 (sin fuerza)':fn(F)+(F===1?' vez':' veces');
+  $('#iOut').textContent=qa*qb===0?'Ninguna':(qa*qb>0?'Se repelen':'Se atraen');
+  const cx=300,gap=60+d*45,xa=cx-gap/2-30,xb=cx+gap/2+30;
+  const col=q=>q>0?'#72be44':(q<0?'#7fb8e0':'#b9c7c3');
+  let len=Math.min(110,F*14);if(qa*qb<0)len=Math.min(len,((xb-xa)-68)/2-8);
+  let ar='';
+  if(F>0){const dir=qa*qb>0?-1:1;const a1s=xa+(dir>0?34:-34),a1e=a1s+dir*len,a2s=xb-(dir>0?34:-34),a2e=a2s-dir*len;
+    const hd=(x,dx)=>`<polygon points="${x},80 ${x-dx*14},71 ${x-dx*14},89"/>`;
+    ar=`<g stroke="currentColor" stroke-width="6" stroke-linecap="round"><line x1="${a1s}" y1="80" x2="${a1e-dir*10}" y2="80"/><line x1="${a2s}" y1="80" x2="${a2e+dir*10}" y2="80"/></g><g fill="currentColor">${hd(a1e,dir)}${hd(a2e,-dir)}</g>`;}
+  const r=q=>22+Math.abs(q)*4;
+  $('#coulombSvg').innerHTML=`<g style="color:var(--ink)">${ar}</g><circle cx="${xa}" cy="80" r="${r(qa)}" fill="${col(qa)}"/><text x="${xa}" y="88" text-anchor="middle" font-size="24" font-weight="700" fill="#123b16" font-family="Arial">${fs(qa)}</text><circle cx="${xb}" cy="80" r="${r(qb)}" fill="${col(qb)}"/><text x="${xb}" y="88" text-anchor="middle" font-size="24" font-weight="700" fill="#123b16" font-family="Arial">${fs(qb)}</text>`;
+}
+['qa','qb','dd'].forEach(id=>$('#'+id).addEventListener('input',drawC));drawC();
+
+/* ---------------- simulador de Nernst ---------------- */
+const VMIN=-115,VMAX=-60,pos=v=>Math.max(0,Math.min(100,(v-VMIN)/(VMAX-VMIN)*100));
+function drawM(){const ke=+$('#ke').value,v=vm(ke);$('#keOut').textContent=ke.toFixed(1).replace('.',',');
+  $('#vmOut').textContent='−'+Math.abs(v).toFixed(1).replace('.',',');$('#needle').style.left=`calc(${pos(v)}% - 2px)`;
+  const a=pos(vm(3.5)),b=pos(vm(5.5));$('#band').style.left=a+'%';$('#band').style.width=(b-a)+'%';}
+$('#ke').addEventListener('input',drawM);drawM();
+
+/* ---------------- corrección ---------------- */
+function parseNum(s){return parseFloat(String(s||'').trim().replace(/\s/g,'').replace(',','.').replace('−','-'));}
+function setMark(id,ok){const m=$('#m-'+id);if(!m)return;m.className='mark '+(ok?'ok':'bad');m.textContent=ok?'Correcto':'Revisad';}
+function fb(id,ok,txt){const f=$('#fb-'+id);if(!f)return;f.hidden=false;f.className='fb '+(ok?'ok':'bad');f.textContent=txt;}
+function chkMcq(list){let n=0;list.forEach(q=>{const ok=state.ans[q.id]===q.c;if(ok)n++;fb(q.id,ok,(ok?'Correcto. ':'Todavía no. Pista: ')+q.why);});return n;}
+function chkNum(list){let n=0;list.forEach(q=>{const v=parseNum(state.ans[q.id]);const ok=!isNaN(v)&&Math.abs(v-q.target)<=q.tol;if(ok)n++;
+  let msg;if(ok)msg='Correcto: ≈ '+q.target.toFixed(2).replace('.',',')+' '+q.unit+'.';
+  else if(!isNaN(v)&&q.target<0&&v>0)msg='Revisad el signo: el interior de la célula es negativo.';
+  else msg='Todavía no. Pista: '+q.hint;fb(q.id,ok,msg);});return n;}
+function chkSeg(prefix,list,withFb){let n=0;list.forEach(([id,,c,why])=>{const ok=state.ans[prefix+id]===c;if(ok)n++;setMark(prefix+id,ok);
+  if(withFb){const f=$('#fb-'+prefix+id);f.hidden=!ok;f.className='fb ok';f.textContent=why;}});return n;}
+const checks={
+ s1(){const n=chkSeg('s1-',S1LIST)+chkMcq(S1MCQA)+chkNum(S1NUM)+chkMcq(S1MCQB);return [n,S1LIST.length+S1MCQA.length+S1NUM.length+S1MCQB.length];},
+ s2(){const n=chkNum(S2NUM)+chkMcq(S2MCQ)+chkSeg('s2-',S2LIST,true);return [n,S2NUM.length+S2MCQ.length+S2LIST.length];},
+ s3(){const n=chkNum(S3NUMA)+chkNum(S3NUMB)+chkMcq(S3MCQ);return [n,S3NUMA.length+S3NUMB.length+S3MCQ.length];},
+ s4(){const n=chkNum(S4NUM)+chkMcq(S4MCQ);return [n,S4NUM.length+S4MCQ.length];},
+ s5(){let n=0;S5.forEach(([id,,c])=>{const ok=String(state.ans['s5-'+id])===String(c);if(ok)n++;setMark('s5-'+id,ok);});return [n,S5.length];}};
+document.querySelectorAll('[data-check]').forEach(b=>b.addEventListener('click',()=>{
+  const st=b.dataset.check;state.tries[st]=(state.tries[st]||0)+1;const [n,t]=checks[st]();state.scores[st]=[n,t];save();
+  $('#'+st+'score').textContent=`${n} de ${t} correctas (intento ${state.tries[st]})`;markNav();}));
+function markNav(){document.querySelectorAll('nav.steps a[data-st]').forEach(a=>{const s=state.scores[a.dataset.st];a.classList.toggle('done',!!s&&s[0]===s[1]);});}
+Object.keys(state.scores).forEach(st=>{const [n,t]=state.scores[st];const el=$('#'+st+'score');if(el)el.textContent=`${n} de ${t} correctas (intento ${state.tries[st]||1})`;});markNav();
+
+/* ---------------- resumen ---------------- */
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const NAMES=['Carga y Coulomb','Campo y potencial','Condensadores y corriente','Caso Michi','La consulta'];
+$('#makeSummary').addEventListener('click',()=>{
+  ['s1','s2','s3','s4','s5'].forEach(s=>{if(!state.scores[s]){state.scores[s]=checks[s]();}});save();markNav();
+  let tot=0,max=0;const lines=[];
+  ['s1','s2','s3','s4','s5'].forEach((s,i)=>{const sc=state.scores[s];tot+=sc[0];max+=sc[1];lines.push(`${i+1}. ${NAMES[i]}: ${sc[0]}/${sc[1]} (intentos: ${state.tries[s]||0})`);});
+  const now=new Date().toLocaleString('es');const box=$('#summary');box.classList.add('show');
+  box.innerHTML=`<h2>Resumen de la actividad</h2>
+   <p><b>Integrantes:</b> ${esc(state.ans.names)||'(sin nombres)'}<br><b>Grupo:</b> ${esc(state.ans.group)||'(sin grupo)'}<br><b>Fecha:</b> ${esc(now)}</p>
+   <div class="sumgrid">${['s1','s2','s3','s4','s5'].map((s,i)=>`<div><b>${state.scores[s][0]}/${state.scores[s][1]}</b>${NAMES[i]}<br><span class="note">${state.tries[s]||0} intento(s)</span></div>`).join('')}</div>
+   <p><b>Total autocorregido:</b> ${tot} de ${max}</p>
+   <div class="answers"><b>Estación 2. Por qué el gorrión no se electrocuta</b><p>${esc(state.ans.open2)||'(sin respuesta)'}</p>
+   <b>Estación 4. Por qué el corazón de Michi late despacio</b><p>${esc(state.ans.open4)||'(sin respuesta)'}</p>
+   <b>Estación 5. Concepto más útil para la práctica</b><p>${esc(state.ans.open5)||'(sin respuesta)'}</p></div>
+   <div class="row"><button class="ghost" id="copyBtn">Copiar respuestas</button><button class="ghost" id="printBtn">Imprimir o guardar PDF</button><button class="ghost" id="resetBtn">Empezar de nuevo</button></div>
+   <p class="note" id="sumNote">Si estos botones no funcionan en vuestro dispositivo, haced una captura de esta pantalla y entregadla.</p>`;
+  $('#copyBtn').onclick=async()=>{const txt=`El paciente eléctrico\nIntegrantes: ${state.ans.names||''}\nGrupo: ${state.ans.group||''}\nFecha: ${now}\n\n${lines.join('\n')}\nTotal: ${tot}/${max}\n\nE2: ${state.ans.open2||''}\nE4: ${state.ans.open4||''}\nE5: ${state.ans.open5||''}`;
+    try{await navigator.clipboard.writeText(txt);$('#sumNote').textContent='Respuestas copiadas. Pegadlas donde indique el docente.';}catch(e){$('#sumNote').textContent='No se pudo copiar en este dispositivo. Haced una captura de esta pantalla.';}};
+  $('#printBtn').onclick=()=>{try{window.print();}catch(e){$('#sumNote').textContent='No se pudo abrir la impresión. Haced una captura de esta pantalla.';}};
+  $('#resetBtn').onclick=()=>{if(confirm('¿Borrar todas las respuestas de este dispositivo?')){try{localStorage.removeItem(KEY)}catch(e){}location.reload();}};
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+});
+</script>
+</body>
+</html>
